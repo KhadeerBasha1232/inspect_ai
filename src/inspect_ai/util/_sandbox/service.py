@@ -867,8 +867,10 @@ class SandboxService:
     # in point of fact we don't expect this code to ever change which is why
     # we haven't invested in an automated code syncing regimen.
     def _generate_client(self) -> str:
+        # The client runs under the sandbox's python3, which may predate 3.9, so
+        # its annotations must not subscript builtins (use typing.Tuple etc.).
         return dedent(f"""
-        from typing import Any
+        from typing import Any, Tuple
 
         def call_{self._name}(method: str, **params: Any) -> Any:
             from time import sleep
@@ -900,7 +902,7 @@ class SandboxService:
                 dump(request_data, f)
             return request_id
 
-        def _read_{self._name}_response(request_id: str, method: str) -> tuple[bool, Any]:
+        def _read_{self._name}_response(request_id: str, method: str) -> Tuple[bool, Any]:
             from json import JSONDecodeError, load
 
             responses_dir = _{self._name}_service_dir("{RESPONSES_DIR}")

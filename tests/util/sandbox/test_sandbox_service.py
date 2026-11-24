@@ -1,3 +1,4 @@
+import ast
 import json
 import shutil
 import subprocess
@@ -43,6 +44,7 @@ from inspect_ai.util._sandbox.service import (
     SERVICES_DIR,
     SandboxService,
     sandbox_service,
+    sandbox_service_script,
 )
 from inspect_ai.util._subprocess import ExecResult
 
@@ -1059,6 +1061,48 @@ async def test_handle_requests_survives_stray_non_file_entry(tmp_path: Path) -> 
         "valid request was dropped because the listing script reported failure"
     )
     assert json.loads(fake.writes[response_path])["result"] == "ok"
+
+
+def test_sandbox_service_client_imports_on_python_before_3_9() -> None:
+    """The generated client evaluates its annotations under the sandbox's python3.
+
+    Builtin generics (``tuple[...]``) need 3.9 and ``X | Y`` needs 3.10, so
+    neither may appear in an annotation without postponed evaluation.
+    """
+    script = sandbox_service_script("demo")
+    tree = ast.parse(script, feature_version=(3, 7))
+    assert not any(
+        isinstance(node, ast.ImportFrom) and node.module == "__future__"
+        for node in tree.body
+    ), "update this test if the client adopts postponed annotations"
+
+    annotations: list[ast.expr] = []
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            all_args = [
+                *node.args.posonlyargs,
+                *node.args.args,
+                *node.args.kwonlyargs,
+                *([node.args.vararg] if node.args.vararg else []),
+                *([node.args.kwarg] if node.args.kwarg else []),
+            ]
+            annotations.extend(a.annotation for a in all_args if a.annotation)
+            if node.returns is not None:
+                annotations.append(node.returns)
+        elif isinstance(node, ast.AnnAssign):
+            annotations.append(node.annotation)
+
+    builtin_generics = {"tuple", "list", "dict", "set", "frozenset", "type"}
+    for annotation in annotations:
+        for node in ast.walk(annotation):
+            assert not (
+                isinstance(node, ast.Subscript)
+                and isinstance(node.value, ast.Name)
+                and node.value.id in builtin_generics
+            ), f"needs Python 3.9: {ast.unparse(annotation)}"
+            assert not (
+                isinstance(node, ast.BinOp) and isinstance(node.op, ast.BitOr)
+            ), f"needs Python 3.10: {ast.unparse(annotation)}"
 
 
 @pytest.mark.parametrize(
