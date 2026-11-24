@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.3.293](https://github.com/UKGovernmentBEIS/inspect_ai/compare/0.3.292...0.3.293) (2026-11-24)
+
+
+### Features
+
+* model cache entries use a JSON format; entries from earlier versions are not reused (`inspect cache prune` removes them) ([#6732](https://github.com/UKGovernmentBEIS/inspect_ai/issues/6732)) ([83561de](https://github.com/UKGovernmentBEIS/inspect_ai/commit/83561dec9facc2074dbc051ced0ac0865e8b73a4))
+* opt-in explicit prompt caching when a base URL is configured ([#6416](https://github.com/UKGovernmentBEIS/inspect_ai/issues/6416)) ([d62f43f](https://github.com/UKGovernmentBEIS/inspect_ai/commit/d62f43f913aed9ac78e7539c6a2a86d80fede078))
+
+
+### Bug Fixes
+
+* a second sample cancel no longer changes how a running sample ends ([#6735](https://github.com/UKGovernmentBEIS/inspect_ai/issues/6735)) ([1febfc6](https://github.com/UKGovernmentBEIS/inspect_ai/commit/1febfc6362e490f891e0b06739a4b98d63eec3c4))
+* **anthropic:** compaction no longer fails with a 400 when a server tool result arrives the turn after its call ([#6514](https://github.com/UKGovernmentBEIS/inspect_ai/issues/6514)) ([3d1dc93](https://github.com/UKGovernmentBEIS/inspect_ai/commit/3d1dc9344f081f507013b43ca446c9d04f7cc6b4))
+* in-loop scorers' exec_remote() calls run as the sandbox default user, as exec() does ([#6722](https://github.com/UKGovernmentBEIS/inspect_ai/issues/6722)) ([3028970](https://github.com/UKGovernmentBEIS/inspect_ai/commit/302897062b17a1537882002f37446c003d248e54))
+* preserve internal state across multiple assistant text blocks ([#5553](https://github.com/UKGovernmentBEIS/inspect_ai/issues/5553)) ([62e3088](https://github.com/UKGovernmentBEIS/inspect_ai/commit/62e30883cc3c4379d226e4438bed295cf0610c5f))
+* reading a Responses conversation no longer fails on a computer call without pending_safety_checks ([#6716](https://github.com/UKGovernmentBEIS/inspect_ai/issues/6716)) ([5db659c](https://github.com/UKGovernmentBEIS/inspect_ai/commit/5db659ca23c33e5daceb014cbdf10fa75884c591))
+* **scorer:** preserve explicitly cleared score edit fields ([#6310](https://github.com/UKGovernmentBEIS/inspect_ai/issues/6310)) ([ba79e97](https://github.com/UKGovernmentBEIS/inspect_ai/commit/ba79e97280aca125ee6ae1409ab988ed34480a64))
+* **sentinel:** a sample no longer waits on an approval prompt after its sidecar question has closed ([#6734](https://github.com/UKGovernmentBEIS/inspect_ai/issues/6734)) ([c2aab5c](https://github.com/UKGovernmentBEIS/inspect_ai/commit/c2aab5cc62f90460f0f48b0ed04bf9e21b2e6f19))
+
 ## [0.3.292](https://github.com/UKGovernmentBEIS/inspect_ai/compare/0.3.291...0.3.292) (2026-11-23)
 
 
